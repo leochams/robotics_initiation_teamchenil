@@ -239,8 +239,19 @@ def circle(x, z, r, t, duration):
     """
     None
 
-def segment(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
+def segmentcos(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
     nt = math.cos(2*math.pi*(t/duration) +1) * duration /2
+    x = (nt/duration) * (segment_x2 - segment_x1)+ segment_x1
+    y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
+    z = (nt/duration) * (segment_z2 - segment_z1)+ segment_z1
+    theta1, theta2, theta3 = computeIK(x,y,z)
+    return(theta1,theta2,theta3)
+
+def segmentmod(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
+    nt = math.fmod(t,duration)
+    if nt > (duration/2.0):
+        nt = (duration/2)-(nt-duration/2)
+    nt = 2*nt                   #triangular function from 0 to duration
     x = (nt/duration) * (segment_x2 - segment_x1)+ segment_x1
     y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
     z = (nt/duration) * (segment_z2 - segment_z1)+ segment_z1
