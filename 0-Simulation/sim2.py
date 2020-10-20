@@ -142,7 +142,7 @@ while True:
             segment_y2 = p.readUserDebugParameter(sliders["segment_y2"])
             segment_z2 = p.readUserDebugParameter(sliders["segment_z2"])
             duration = p.readUserDebugParameter(sliders["segment_duration"])
-            alphas = kinematics.segment_1way(
+            alphas = kinematics.segment(
                 segment_x1,
                 segment_y1,
                 segment_z1,
