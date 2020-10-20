@@ -222,6 +222,7 @@ def triangle(x, z, h, w, t, period=5):
     """
     Takes the geometric parameters of the triangle and the current time, gives the joint angles to draw the triangle with the tip of th leg. Format : [theta1, theta2, theta3]
     """
+    alphas = [0,0,0]
     points = trianglePoints(x,z,h,w)
     d1 = segdist(points[0],points[1])
     d2 = segdist(points[1],points[2])
@@ -231,12 +232,12 @@ def triangle(x, z, h, w, t, period=5):
     peri3 = (d3/(d1+d2+d3))*period
     t = math.fmod(t,period)
     
-    if  t <  peri1 : 
+    if  (t < peri1) : 
         alphas = segment_1way(points[0][0],points[0][1],points[0][2],points[1][0],points[1][1],points[1][2],t,peri1)
-    elif  t < peri1+peri2 :
-        alphas = segment_1way(points[1][0],points[1][1],points[1][2],points[2][0],points[2][1],points[2][2],t,peri2)
+    elif  (t < (peri1+peri2)) :
+        alphas = segment_1way(points[1][0],points[1][1],points[1][2],points[2][0],points[2][1],points[2][2],t - peri1,peri2)
     else :
-        alphas = segment_1way(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t,peri3)
+        alphas = segment_1way(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t - peri1 - peri2,peri3)
     return alphas
 
 """ def triangle(x, z, h, w, t, period=5):
