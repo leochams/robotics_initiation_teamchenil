@@ -216,7 +216,11 @@ def triangle(x, z, h, w, t):
     """
     Takes the geometric parameters of the triangle and the current time, gives the joint angles to draw the triangle with the tip of th leg. Format : [theta1, theta2, theta3]
     """
-    None
+    alphas = [(segment(x,-w/2,z,x,w/2,z,t,3)),(segment(x,-w/2,z,x,0,z+h,t,3)),(segment(x,0,z+h,x,w/2,z,t,3))]
+ """    alphas =segment(x,-w/2,z,x,0,z+h,t,3)
+    alphas =segment(x,0,z+h,x,w/2,z,t,3) """
+
+    return(alphas)
 
 
 def circlePoints(x, z, r, N=16):
@@ -237,9 +241,14 @@ def circle(x, z, r, t, duration):
     """
     Takes the geometric parameters of the circle and the current time, gives the joint angles to draw the circle with the tip of th leg. Format : [theta1, theta2, theta3]
     """
-    None
+    y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
+    z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
+    alphas = computeIK(x, y_circle, z_circle + z)
+    return(alphas)
 
-def segmentcos(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
+
+#segment function with cosinus 
+def segment(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
     nt = math.cos(2*math.pi*(t/duration) +1) * duration /2
     x = (nt/duration) * (segment_x2 - segment_x1)+ segment_x1
     y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
@@ -247,7 +256,8 @@ def segmentcos(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segmen
     theta1, theta2, theta3 = computeIK(x,y,z)
     return(theta1,theta2,theta3)
 
-def segmentmod(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
+#segment function with modulo
+""" def segmentmod(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
     nt = math.fmod(t,duration)
     if nt > (duration/2.0):
         nt = (duration/2)-(nt-duration/2)
@@ -256,7 +266,7 @@ def segmentmod(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segmen
     y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
     z = (nt/duration) * (segment_z2 - segment_z1)+ segment_z1
     theta1, theta2, theta3 = computeIK(x,y,z)
-    return(theta1,theta2,theta3)
+    return(theta1,theta2,theta3) """
 
 def main():
     print(

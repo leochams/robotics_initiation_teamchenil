@@ -111,7 +111,7 @@ while True:
             targets = {
                 "motor1": -alphas[0],
                 "motor2": -alphas[1],
-                "motor3": alphas[2],
+                "motor3":  alphas[2],
             }
             pos = kinematics.computeDK(alphas[0], alphas[1], alphas[2])
             pos[0] += bx
