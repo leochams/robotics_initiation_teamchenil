@@ -169,8 +169,8 @@ def computeIKNotOriented(x, y, z, legID, params, verbose=False):
 def rotaton_2D(x, y, z, theta):
     # Applying a rotation around the Z axis
     # TODO
-    new_x = 0
-    new_y = 0
+    new_x = math.cos(theta)*x - math.sin(theta)* y 
+    new_y = math.sin(theta)*x + math.cos(theta) * y
 
     return [new_x, new_y, z]
 
@@ -273,12 +273,21 @@ def circlePoints(x, z, r, N=16):
 
 
 def circle(x, z, r, t, duration):
-    """
-    Takes the geometric parameters of the circle and the current time, gives the joint angles to draw the circle with the tip of th leg. Format : [theta1, theta2, theta3]
-    """
+    
+    #Takes the geometric parameters of the circle and the current time, gives the joint angles to draw the circle with the tip of th leg. Format : [theta1, theta2, theta3]
+    
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
     z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
     alphas = computeIK(x, y_circle, z_circle + z)
+    return(alphas)
+
+def demicircle(x,z,r,t,duration):
+    y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
+    z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
+    if y_circle == 0 :
+        alphas = segment_1way(x,y_circle,z_circle,x,0,z,t,duration)
+    else :
+        alphas = computeIK(x, y_circle, z_circle + z)
     return(alphas)
 
 def segment_1way(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
