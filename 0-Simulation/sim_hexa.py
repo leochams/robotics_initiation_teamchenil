@@ -69,21 +69,21 @@ while True:
     if args.mode == "frozen-direct":
         for name in controls.keys():
             targets[name] = p.readUserDebugParameter(controls[name])
-        # points = kinematics.computeDKDetailed(
-        #     targets["j_c1_rf"], targets["j_thigh_rf"], targets["j_tibia_rf"]
-        # )
-        # i = -1
-        # for T in points:
-        #     # Drawing each step of the DK calculation
-        #     i += 1
-        #     T = kinematics.rotaton_2D(T[0], T[1], T[2], leg_angle)
-        #     T[0] += leg_center_pos[0]
-        #     T[1] += leg_center_pos[1]
-        #     T[2] += leg_center_pos[2]
-        #     # print("Drawing cross {} at {}".format(i, T))
-        #     p.resetBasePositionAndOrientation(
-        #         crosses[i], T, to_pybullet_quaternion(0, 0, leg_angle)
-        #     )
+        points = kinematics.computeDKDetailed(
+            targets["j_c1_rf"], targets["j_thigh_rf"], targets["j_tibia_rf"]
+        )
+        i = -1
+        for T in points:
+            # Drawing each step of the DK calculation
+            i += 1
+            T = kinematics.rotaton_2D(T[0], T[1], T[2], leg_angle)
+            T[0] += leg_center_pos[0]
+            T[1] += leg_center_pos[1]
+            T[2] += leg_center_pos[2]
+            # print("Drawing cross {} at {}".format(i, T))
+            p.resetBasePositionAndOrientation(
+                crosses[i], T, to_pybullet_quaternion(0, 0, leg_angle)
+            )
         # Temp
         sim.setRobotPose([0, 0, 0.5], to_pybullet_quaternion(0, 0, 0))
         # sim.setRobotPose(

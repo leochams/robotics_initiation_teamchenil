@@ -37,16 +37,22 @@ sim.setRobotPose([0, 0, 0.5], to_pybullet_quaternion(90, 0, 0, degrees = True))
 leg_center_pos = [0.1248, -0.06164, 0.001116 + 0.5]
 leg_angle = -math.pi / 4
 
-while(True):   
+
+for name in sim.getJoints():
+    #print(name)
+    if "c1" in name or "thigh" in name or "tibia" in name:
+        controls[name] = p.addUserDebugParameter(name, -math.pi, math.pi, 0)
+
+while(True): 
+    targets = {}  
     time.sleep(0.001)
-    for name in sim.getJoints():
-        #print(name)
-        if "c1" in name or "thigh" in name or "tibia" in name:
-            controls[name] = p.addUserDebugParameter(name, -math.pi, math.pi, 0)
-    
     sim.setRobotPose([0, 0, 0.5], to_pybullet_quaternion(10*time.time(), 0, 0, degrees = True))
     print(p.readUserDebugParameter(0))
+    for name in controls.keys():
+        targets[name] = p.readUserDebugParameter(controls[name])
     
+    state = sim.setJoints(targets)
+    print(targets)
     sim.tick()
     
 

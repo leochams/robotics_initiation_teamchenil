@@ -148,7 +148,7 @@ def computeIK(
 
 
 # Computes the inverse kinematics of a leg in a frame colinear to the robot's frame (x points in front of the robot, y points to its left, z towards the sky)
-# but whose (0,0) point is leg dependent, ie will match the leg's initial position.
+# but whose (0,0,0) point is leg dependent, ie will match the leg's initial position.
 # Given the destination point (x, y, z) of a limb with 3 rotational axes separated by the distances (l1, l2, l3),
 # returns the angles to apply to the 3 axes
 def computeIKOriented(x, y, z, legID, params, extra_theta=0, verbose=False):
@@ -168,7 +168,7 @@ def computeIKNotOriented(x, y, z, legID, params, verbose=False):
 
 def rotaton_2D(x, y, z, theta):
     # Applying a rotation around the Z axis
-    # TODO
+
     new_x = math.cos(theta)*x - math.sin(theta)* y 
     new_y = math.sin(theta)*x + math.cos(theta) * y
 
@@ -272,20 +272,22 @@ def circlePoints(x, z, r, N=16):
 """
 
 
-def circle(x, z, r, t, duration):
+""" def circle(x, z, r, t, duration):
     
     #Takes the geometric parameters of the circle and the current time, gives the joint angles to draw the circle with the tip of th leg. Format : [theta1, theta2, theta3]
     
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
     z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
     alphas = computeIK(x, y_circle, z_circle + z)
-    return(alphas)
+    return(alphas) """
 
-def demicircle(x,z,r,t,duration):
+def circle(x,z,r,t,duration):
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
-    z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
-    if y_circle == 0 :
-        alphas = segment_1way(x,y_circle,z_circle,x,0,z,t,duration)
+    z_circle = r * math.sin(2 * math.pi * (1 / duration) * t)
+    p1 = [x,y_circle+r,z_circle ]
+    p2 = [x,y_circle,z ]
+    if z_circle< 0 :
+        alphas = segment_1way(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,duration)
     else :
         alphas = computeIK(x, y_circle, z_circle + z)
     return(alphas)
