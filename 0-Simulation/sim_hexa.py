@@ -12,7 +12,7 @@ from constants import *
 
 class Parameters:
     def __init__(
-        self, z=-60,
+        self, z=-0.12,
     ):
         self.z= z
         self.legAngles = LEG_ANGLES
@@ -91,7 +91,10 @@ elif args.mode == "inverse":
     controls["target_x"] = p.addUserDebugParameter("target_x", -0.4, 0.4, alphas[0])
     controls["target_y"] = p.addUserDebugParameter("target_y", -0.4, 0.4, alphas[1])
     controls["target_z"] = p.addUserDebugParameter("target_z", -0.4, 0.4, alphas[2])
-
+elif args.mode == "robot-ik":
+    controls["target_x"] = p.addUserDebugParameter("target_x",0,0.05)
+    controls["target_y"] = p.addUserDebugParameter("target_y",0,0.05)
+    controls["target_z"] = p.addUserDebugParameter("target_z",0,0.05)
 
 while True:
     targets = {}
@@ -155,11 +158,16 @@ while True:
         p.resetBasePositionAndOrientation(
             cross, T, to_pybullet_quaternion(0, 0, leg_angle)
         )
-
     elif args.mode == "robot-ik" :
         params = Parameters()
+        x = p.readUserDebugParameter(controls["target_x"])
+        y = p.readUserDebugParameter(controls["target_y"])
+        z = p.readUserDebugParameter(controls["target_z"])
         for leg_id in range(1,7):
-            alphas = kinematicsnew.computeIKOriented(0,0,0,leg_id,params)
+            alphas = kinematicsnew.computeIKOriented(x * math.sin(2*math.pi*0.5*time.time()),
+                                                    y * math.sin(2*math.pi*0.5*time.time()),
+                                                    z * math.sin(2*math.pi*0.5*time.time()),
+                                                    leg_id,params)
             set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets)
     sim.tick()

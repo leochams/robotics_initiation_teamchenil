@@ -195,11 +195,7 @@ def computeIK(
 # returns the angles to apply to the 3 axes
 def computeIKOriented(x, y, z, legID, params, extra_theta=0, verbose=False):
 
-    x,y,z = rotaton_2D(
-                    x ,
-                    y ,
-                    z ,
-                    LEG_ANGLES[legID-1])
+    x,y,z = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID-1])
     alphas = computeIK(x + params.initLeg[legID-1][0],
                         y + params.initLeg[legID-1][1],
                         z+ params.z)
