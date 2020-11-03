@@ -7,7 +7,7 @@ from transforms3d.quaternions import mat2quat, quat2mat
 import pybullet as p
 import pygame
 import argparse
-import kinematics
+import kinematicsnew
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -65,7 +65,7 @@ while True:
             for joint in joints:
                 targets[joint] = p.readUserDebugParameter(sliders[joint])
 
-            T = kinematics.computeDK(
+            T = kinematicsnew.computeDK(
                 -targets["motor1"], -targets["motor2"], targets["motor3"]
             )
             # T = model.direct(targets)
@@ -81,7 +81,7 @@ while True:
             p.resetBasePositionAndOrientation(target, [x + bx, y, z + bz], [0, 0, 0, 1])
 
             if args.mode == "inverse":
-                alphas = kinematics.computeIK(x, y, z)
+                alphas = kinematicsnew.computeIK(x, y, z)
                 print(
                     "Asked IK for x:{}, y:{}, z{}, got theta1:{}, theta2:{}, theta3:{}".format(
                         x, y, z, alphas[0], alphas[1], alphas[2]
@@ -94,7 +94,7 @@ while True:
                 }
             elif args.mode == "inverse-iterative":
                 if (time.time() - lastInverse) > 0.1:
-                    alphas = kinematics.inverseIterative(x, y, z)
+                    alphas = kinematicsnew.inverseIterative(x, y, z)
                     targets = {
                         "motor1": -alphas[0],
                         "motor2": -alphas[1],
@@ -107,13 +107,13 @@ while True:
             h = p.readUserDebugParameter(sliders["triangle_h"])
             w = p.readUserDebugParameter(sliders["triangle_w"])
 
-            alphas = kinematics.triangle(x, z, h, w, sim.t)
+            alphas = kinematicsnew.triangle(x, z, h, w, sim.t)
             targets = {
                 "motor1": -alphas[0],
                 "motor2": -alphas[1],
                 "motor3":  alphas[2],
             }
-            pos = kinematics.computeDK(alphas[0], alphas[1], alphas[2])
+            pos = kinematicsnew.computeDK(alphas[0], alphas[1], alphas[2])
             pos[0] += bx
             pos[2] += bz
             sim.addDebugPosition(pos, duration=3)
@@ -123,14 +123,14 @@ while True:
             z = p.readUserDebugParameter(sliders["circle_z"])
             r = p.readUserDebugParameter(sliders["circle_r"])
             duration = p.readUserDebugParameter(sliders["circle_duration"])
-            alphas = kinematics.circle(x, z, r, sim.t, duration)
+            alphas = kinematicsnew.circle(x, z, r, sim.t, duration)
 
             targets = {
                 "motor1": -alphas[0],
                 "motor2": -alphas[1],
                 "motor3": alphas[2],
             }
-            pos = kinematics.computeDK(alphas[0], alphas[1], alphas[2])
+            pos = kinematicsnew.computeDK(alphas[0], alphas[1], alphas[2])
             pos[0] += bx
             pos[2] += bz
             sim.addDebugPosition(pos, duration=3)
@@ -142,7 +142,7 @@ while True:
             segment_y2 = p.readUserDebugParameter(sliders["segment_y2"])
             segment_z2 = p.readUserDebugParameter(sliders["segment_z2"])
             duration = p.readUserDebugParameter(sliders["segment_duration"])
-            alphas = kinematics.segment(
+            alphas = kinematicsnew.segment(
                 segment_x1,
                 segment_y1,
                 segment_z1,
@@ -158,7 +158,7 @@ while True:
                 "motor2": -alphas[1],
                 "motor3": alphas[2],
             }
-            pos = kinematics.computeDK(alphas[0], alphas[1], alphas[2])
+            pos = kinematicsnew.computeDK(alphas[0], alphas[1], alphas[2])
             pos[0] += bx
             pos[2] += bz
             sim.addDebugPosition(pos, duration=3)
