@@ -193,6 +193,8 @@ def computeIK(
 # but whose (0,0) point is leg dependent, ie will match the leg's initial position.
 # Given the destination point (x, y, z) of a limb with 3 rotational axes separated by the distances (l1, l2, l3),
 # returns the angles to apply to the 3 axes
+
+#extrat theta help for adding angle in dplcmt
 def computeIKOriented(x, y, z, legID, params, extra_theta=math.pi/4, verbose=False):
 
     x,y,z = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID-1] + extra_theta)
