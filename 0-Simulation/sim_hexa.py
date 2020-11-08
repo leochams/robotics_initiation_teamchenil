@@ -34,10 +34,10 @@ class Parameters:
         self.legs[4] = ["j_c1_lr","j_thigh_lr","j_tibia_lr"]
 
 #Init robot arms position
-def initRobot(params):
+def initRobot(params,extra_theta):
     targets = {}
     for leg_id in range(1,7):
-        alphas =  kinematicsnew.computeIKOriented(0,0,0,leg_id,params)
+        alphas =  kinematicsnew.computeIKOriented(0,0,0,leg_id,params,extra_theta)
         set_leg_angles(alphas, leg_id, targets, params)
     state = sim.setJoints(targets)
     sim.tick()
@@ -105,13 +105,14 @@ elif args.mode == "robot-ik":
     controls["target_z"] = p.addUserDebugParameter("target_z",0,0.05)
 
 elif args.mode == "walking":
-    controls["target_x"] = p.addUserDebugParameter("target_x",-0.1,0.1,0.1)
+    #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
     controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0,-0.1)
     controls["target_h"] = p.addUserDebugParameter("target_h",0.1,0.5,0.1)
     controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
-    controls["target_p"] = p.addUserDebugParameter("target_p",0.1,10,1)
+    controls["target_p"] = p.addUserDebugParameter("target_p",0.5,1,1)
+    controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
 
-initRobot(params)
+initRobot(params,0)
 
 
 while True:
@@ -180,27 +181,32 @@ while True:
         x = p.readUserDebugParameter(controls["target_x"])
         y = p.readUserDebugParameter(controls["target_y"])
         z = p.readUserDebugParameter(controls["target_z"])
+        extra_theta = p.readUserDebugParameter(controls["direction"])
         for leg_id in range(1,7):
             alphas = kinematicsnew.computeIKOriented(x * math.sin(2*math.pi*0.5*time.time()),
                                                     y * math.sin(2*math.pi*0.5*time.time()),
                                                     z * math.sin(2*math.pi*0.5*time.time()),
-                                                    leg_id,params)
+                                                    leg_id,
+                                                    params,
+                                                    extra_theta)
             set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets)
 
     elif args.mode == "walking" :
-        x = p.readUserDebugParameter(controls["target_x"])
+        #x = p.readUserDebugParameter(controls["target_x"])
+        x=0
         z = p.readUserDebugParameter(controls["target_z"])
         h = p.readUserDebugParameter(controls["target_h"])
         w = p.readUserDebugParameter(controls["target_w"])
         period = p.readUserDebugParameter(controls["target_p"])
+        extra_theta = p.readUserDebugParameter(controls["direction"])
         for leg_id in range (1,7):
             if (leg_id == 1) or (leg_id == 3) or (leg_id == 5):
-                alphas = kinematicsnew.triangle(x,z,h,w,sim.t,period,leg_id,params)
+                alphas = kinematicsnew.triangle(x,z,h,w,sim.t,period,leg_id,params,extra_theta)
 
                 set_leg_angles(alphas, leg_id, targets, params)
             elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
-                alphas = kinematicsnew.triangle(x,z,h,w,sim.t + 0.5*period ,period,leg_id,params)
+                alphas = kinematicsnew.triangle(x,z,h,w,sim.t + 0.5*period ,period,leg_id,params,extra_theta)
 
                 set_leg_angles(alphas, leg_id, targets, params)
             state = sim.setJoints(targets)

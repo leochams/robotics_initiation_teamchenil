@@ -195,7 +195,15 @@ def computeIK(
 # returns the angles to apply to the 3 axes
 
 #extrat theta help for adding angle in dplcmt
-def computeIKOriented(x, y, z, legID, params, extra_theta=math.pi/4, verbose=False):
+def computeIKOriented(x, y, z, legID, params, extra_theta = 0, verbose=False):
+
+    x,y,z = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID-1])
+    alphas = computeIK(x + params.initLeg[legID-1][0],
+                        y + params.initLeg[legID-1][1],
+                        z+ params.z)
+    return alphas 
+
+def computeIKOrientedExtraAngle(x, y, z, legID, params, extra_theta , verbose=False):
 
     x,y,z = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID-1] + extra_theta)
     alphas = computeIK(x + params.initLeg[legID-1][0],
@@ -262,7 +270,7 @@ def segdist(P1,P2):
     seg = math.sqrt(math.pow(P2[0]-P1[0],2)+math.pow(P2[1]-P1[1],2)+math.pow(P2[2]-P1[2],2))
     return seg
 
-def triangle(x, z, h, w, t, period,legID,params):
+def triangle(x, z, h, w, t, period,legID,params,extra_theta):
     """
     Takes the geometric parameters of the triangle and the current time, gives the joint angles to draw the triangle with the tip of th leg. Format : [theta1, theta2, theta3]
     """
@@ -277,11 +285,11 @@ def triangle(x, z, h, w, t, period,legID,params):
     t = math.fmod(t,period)
     
     if  (t < peri1) : 
-        alphas = segment_1way(points[0][0],points[0][1],points[0][2],points[1][0],points[1][1],points[1][2],t,peri1,legID,params)
+        alphas = segment_1way_ExtraAngle(points[0][0],points[0][1],points[0][2],points[1][0],points[1][1],points[1][2],t,peri1,legID,params,extra_theta)
     elif  (t < (peri1+peri2)) :
-        alphas = segment_1way(points[1][0],points[1][1],points[1][2],points[2][0],points[2][1],points[2][2],t - peri1,peri2,legID,params)
+        alphas = segment_1way_ExtraAngle(points[1][0],points[1][1],points[1][2],points[2][0],points[2][1],points[2][2],t - peri1,peri2,legID,params,extra_theta)
     else :
-        alphas = segment_1way(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t - peri1 - peri2,peri3,legID,params)
+        alphas = segment_1way_ExtraAngle(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t - peri1 - peri2,peri3,legID,params,extra_theta)
     return alphas
 
 def triangletimed(x, z, h, w, t, period,legID,params):
@@ -320,7 +328,7 @@ def circlePoints(x, z, r, N=16):
 """
 
 
-def circle(x, z, r, t, duration):
+def circle(x, z, r, t, duration,leg_id,params) :
     """
     Takes the geometric parameters of the circle and the current time, gives the joint angles to draw the circle with the tip of th leg. Format : [theta1, theta2, theta3]
     """
@@ -329,7 +337,7 @@ def circle(x, z, r, t, duration):
     p1 = [x,y_circle+r,z_circle ]
     p2 = [x,y_circle,z ]
     if z_circle< 0 :
-        alphas = segment_1way(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,duration)
+        alphas = segment_1way(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,duration,leg_id,params)
     else :
         alphas = computeIK(x, y_circle, z_circle + z)
     return(alphas)
@@ -340,6 +348,14 @@ def segment_1way(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segm
     y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
     z = (nt/duration) * (segment_z2 - segment_z1)+ segment_z1
     theta1, theta2, theta3 = computeIKOriented(x,y,z,legID,params)
+    return(theta1,theta2,theta3) 
+
+def segment_1way_ExtraAngle(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration,legID,params,extra_theta):
+    nt = math.fmod(t,duration)
+    x = (nt/duration) * (segment_x2 - segment_x1)+ segment_x1
+    y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
+    z = (nt/duration) * (segment_z2 - segment_z1)+ segment_z1
+    theta1, theta2, theta3 = computeIKOrientedExtraAngle(x,y,z,legID,params,extra_theta)
     return(theta1,theta2,theta3) 
 
 def segment(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration):
