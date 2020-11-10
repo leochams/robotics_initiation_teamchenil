@@ -217,7 +217,11 @@ def computeIKOrientedExtraAngle(x, y, z, legID, params, extra_theta , verbose=Fa
 # Given the destination point (x, y, z) of a limb with 3 rotational axes separated by the distances (l1, l2, l3),
 # returns the angles to apply to the 3 axes
 def computeIKNotOriented(x, y, z, legID, params, verbose=False):
-    None
+    return computeIK(
+        x + params.initLeg[legID - 1][0],
+        y + params.initLeg[legID - 1][1],
+        z + params.z
+    )
 
 
 def rotaton_2D(x, y, z, theta):
@@ -292,6 +296,7 @@ def triangle(x, z, h, w, t, period,legID,params,extra_theta):
         alphas = segment_1way_ExtraAngle(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t - peri1 - peri2,peri3,legID,params,extra_theta)
     return alphas
 
+
 def triangletimed(x, z, h, w, t, period,legID,params):
     """
     Takes the geometric parameters of the triangle and the current time, gives the joint angles to draw the triangle with the tip of th leg. Format : [theta1, theta2, theta3]
@@ -350,6 +355,14 @@ def segment_1way(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segm
     theta1, theta2, theta3 = computeIKOriented(x,y,z,legID,params)
     return(theta1,theta2,theta3) 
 
+def segment_1wayNO(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration,legID,params):
+    nt = math.fmod(t,duration)
+    x = (nt/duration) * (segment_x2 - segment_x1)+ segment_x1
+    y = (nt/duration) * (segment_y2 - segment_y1)+ segment_y1
+    z = (nt/duration) * (segment_z2 - segment_z1)+ segment_z1
+    theta1, theta2, theta3 = computeIKNotOriented(x,y,z,legID,params)
+    return(theta1,theta2,theta3) 
+
 def segment_1way_ExtraAngle(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z2,t , duration,legID,params,extra_theta):
     nt = math.fmod(t,duration)
     x = (nt/duration) * (segment_x2 - segment_x1)+ segment_x1
@@ -366,17 +379,40 @@ def segment(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z
     theta1, theta2, theta3 = computeIK(x,y,z)
     return(theta1,theta2,theta3)
 
+
 def demicircle(x,z,r,t,duration,legID,params,extra_theta):
 
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
     z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
     p1 = [x,y_circle+r,z ]
     p2 = [x,y_circle-r,z ]
-    if z_circle< 0 :
-        alphas = segment_1way_ExtraAngle(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,duration,legID,params,extra_theta)
+    d1=segdist(p1,p2)
+    d2= math.pi * r
+    per1 = (d1/(d1+d2))*duration
+
+
+    if t<per1:
+            alphas = segment_1way_ExtraAngle(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,per1,legID,params,extra_theta)
     else :
         alphas = computeIKOrientedExtraAngle(x, y_circle, z_circle + z, legID, params, extra_theta , verbose=False)
-    return(alphas)
+    return alphas
+
+def demicircleOTG(x,z,r,t,duration,legID,params):
+
+    y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
+    z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
+    p1 = [x,y_circle+r,z ]
+    p2 = [x,y_circle-r,z ]
+    d1=segdist(p1,p2)
+    d2= math.pi * r
+    per1 = (d1/(d1+d2))*duration
+
+
+    if t<per1:
+            alphas = segment_1wayNO(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,per1,legID,params)
+    else :
+        alphas = computeIKNotOriented(x, y_circle, z_circle + z, legID, params, verbose=False)
+    return alphas
 
 def main():
     print(

@@ -120,6 +120,14 @@ elif args.mode == "walkingcircle":
     controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,1,0.595)
     controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
 
+elif args.mode == "rotatecircle":
+    #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
+    controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0,0.0)
+    controls["target_r"] = p.addUserDebugParameter("target_r",0.01,0.5,0.023)
+    # controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
+    controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,1,1)
+    #controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
+
 initRobot(params,0)
 
 
@@ -234,6 +242,25 @@ while True:
                 set_leg_angles(alphas, leg_id, targets, params)
             elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
                 alphas = kinematicsnew.demicircle(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params,extra_theta)
+
+                set_leg_angles(alphas, leg_id, targets, params)
+            state = sim.setJoints(targets)
+    
+    elif args.mode == "rotatecircle" :
+        #x = p.readUserDebugParameter(controls["target_x"])
+        x=0
+        z = p.readUserDebugParameter(controls["target_z"])
+        r = p.readUserDebugParameter(controls["target_r"])
+        # w = p.readUserDebugParameter(controls["target_w"])
+        duration = p.readUserDebugParameter(controls["target_duration"])
+        #extra_theta = p.readUserDebugParameter(controls["direction"])
+        for leg_id in range (1,7):
+            if (leg_id == 1) or (leg_id == 3) or (leg_id == 5):
+                alphas = kinematicsnew.demicircleOTG(x,z,r, sim.t,duration,leg_id,params)
+
+                set_leg_angles(alphas, leg_id, targets, params)
+            elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
+                alphas = kinematicsnew.demicircleOTG(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params)
 
                 set_leg_angles(alphas, leg_id, targets, params)
             state = sim.setJoints(targets)
