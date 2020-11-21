@@ -409,7 +409,7 @@ def demicircleOTG(x,z,r,t,duration,legID,params):
 
 
     if t<per1:
-            alphas = segment_1wayNO(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,per1,legID,params)
+            alphas = demicircle(x,z,r,t,duration,legID,params,extra_theta = False)
     else :
         alphas = computeIKNotOriented(x, y_circle, z_circle + z, legID, params, verbose=False)
     return alphas

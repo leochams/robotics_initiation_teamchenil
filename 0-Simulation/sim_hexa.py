@@ -106,10 +106,10 @@ elif args.mode == "robot-ik":
 
 elif args.mode == "walking":
     #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
-    controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0,-0.1)
-    controls["target_h"] = p.addUserDebugParameter("target_h",0.1,0.5,0.1)
+    controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0.1,0)
+    controls["target_h"] = p.addUserDebugParameter("target_h",0,0.2,0.005)
     controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
-    controls["target_p"] = p.addUserDebugParameter("target_p",0.5,1,1)
+    controls["target_p"] = p.addUserDebugParameter("target_p",0.1,10,1)
     controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
 
 elif args.mode == "walkingcircle":
@@ -119,6 +119,14 @@ elif args.mode == "walkingcircle":
     # controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
     controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,1,0.595)
     controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
+
+elif args.mode == "walkingcircle_oriented":
+    #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
+    controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0,-0.045)
+    controls["target_r"] = p.addUserDebugParameter("target_r",0.01,0.5,0.067)
+    # controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
+    controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,1,0.595)
+    controls["direction"] = p.addUserDebugParameter("direction",-math.pi,math.pi,math.pi/2)
 
 elif args.mode == "rotatecircle":
     #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
@@ -226,6 +234,59 @@ while True:
 
                 set_leg_angles(alphas, leg_id, targets, params)
             state = sim.setJoints(targets)
+
+    elif args.mode == "walkingcircle_oriented" :
+        #x = p.readUserDebugParameter(controls["target_x"])
+        x=0
+        z = p.readUserDebugParameter(controls["target_z"])
+        r = p.readUserDebugParameter(controls["target_r"])
+        # w = p.readUserDebugParameter(controls["target_w"])
+        duration = p.readUserDebugParameter(controls["target_duration"])
+        direction = p.readUserDebugParameter(controls["direction"])
+        if (direction <2) and (direction > -2):
+            extra_theta = 0
+            for leg_id in range (1,7):
+                if (leg_id == 1) or (leg_id == 3) or (leg_id == 5):
+                    alphas = kinematicsnew.demicircle(x,z,r, sim.t,duration,leg_id,params,extra_theta)
+
+                    set_leg_angles(alphas, leg_id, targets, params)
+                elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
+                    alphas = kinematicsnew.demicircle(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params,extra_theta)
+
+                    set_leg_angles(alphas, leg_id, targets, params)
+                state = sim.setJoints(targets)
+        elif (direction!= math.pi/2):
+            extra_theta = math.pi/2
+            for leg_id in range (1,7):
+                if (leg_id == 1) or (leg_id == 3) or (leg_id == 5):
+                    alphas = kinematicsnew.demicircleOTG(x,z,r, sim.t,duration,leg_id,params)
+
+                    set_leg_angles(alphas, leg_id, targets, params)
+                elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
+                    alphas = kinematicsnew.demicircleOTG(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params)
+
+                    set_leg_angles(alphas, leg_id, targets, params)
+                state = sim.setJoints(targets)
+
+        # for leg_id in range (1,7):
+        #     if (leg_id == 1) or (leg_id == 3) or (leg_id == 5):
+        #         alphas1 = kinematicsnew.demicircleOTG(x,z,r, sim.t,duration,leg_id,params)
+        #         alphas2 = kinematicsnew.demicircle(x,z,r, sim.t,duration,leg_id,params,extra_theta)
+        #         A0 = alphas1[0] + alphas2[0]
+        #         A1 = alphas1[1] + alphas2[1]
+        #         A2 = alphas1[2] + alphas2[2]
+        #         ultralphas = [A0,A1,A2]
+        #         set_leg_angles(ultralphas, leg_id, targets, params)
+        #     elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
+        #         alphas1 = kinematicsnew.demicircleOTG(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params)
+        #         alphas2 = kinematicsnew.demicircle(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params,extra_theta)
+        #         A0 = alphas1[0] + alphas2[0]
+        #         A1 = alphas1[1] + alphas2[1]
+        #         A2 = alphas1[2] + alphas2[2]
+        #         ultralphas = [A0,A1,A2]                
+        #         #ultralphas = alphas1 + alphas2
+        #         set_leg_angles(ultralphas, leg_id, targets, params)
+        #     state = sim.setJoints(targets)
 
     elif args.mode == "walkingcircle" :
         #x = p.readUserDebugParameter(controls["target_x"])
