@@ -380,16 +380,14 @@ def segment(segment_x1, segment_y1, segment_z1,segment_x2, segment_y2, segment_z
     return(theta1,theta2,theta3)
 
 
-def demicircle(x,z,r,t,duration,legID,params,extra_theta):
+def segmentcircle(x,z,r,t,duration,legID,params,extra_theta):
 
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
-    z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
+    z_circle = + r * math.sin(2 * math.pi * (1 / duration) * t)
     p1 = [x,y_circle+r,z ]
     p2 = [x,y_circle-r,z ]
-    d1=segdist(p1,p2)
-    d2= math.pi * r
-    per1 = (d1/(d1+d2))*duration
-
+    #per1 = (d1/(d1+d2))*duration
+    per1 = duration /2 
 
     if t<per1:
             alphas = segment_1way_ExtraAngle(p1[0],p1[1],p1[2],p2[0],p2[1],p2[2],t,per1,legID,params,extra_theta)
@@ -397,21 +395,39 @@ def demicircle(x,z,r,t,duration,legID,params,extra_theta):
         alphas = computeIKOrientedExtraAngle(x, y_circle, z_circle + z, legID, params, extra_theta , verbose=False)
     return alphas
 
-def demicircleOTG(x,z,r,t,duration,legID,params):
-
+def demicircleITA(x,z,r,t,duration,legID,params,extra_theta):       # demicercle en l'air 
+    t = math.fmod(t,duration)
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
-    z_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
-    p1 = [x,y_circle+r,z ]
-    p2 = [x,y_circle-r,z ]
-    d1=segdist(p1,p2)
-    d2= math.pi * r
-    per1 = (d1/(d1+d2))*duration
-
+    z_circle = + r * math.sin(2 * math.pi * (1 / duration) * t)
+    #per1 = (d1/(d1+d2))*duration
+    per1 = duration /2 
 
     if t<per1:
-            alphas = demicircle(x,z,r,t,duration,legID,params,extra_theta = False)
+        alphas = computeIKNotOriented(x, -y_circle, z_circle + z, legID, params, verbose=False)
+        
+    return alphas
+
+
+def demicircleOTGITA(x,z,r,t,duration,legID,params):        # demicercle au sol puis demi cercle en l'air
+    t = math.fmod(t,duration)
+    per1 = duration/2
+
+    if t<per1:
+        alphas = demicircleOTG(x,z,r,t,duration,legID,params,extra_theta = False)
     else :
-        alphas = computeIKNotOriented(x, y_circle, z_circle + z, legID, params, verbose=False)
+        alphas = demicircleITA(x,z,r,t - per1,duration,legID,params,extra_theta = False)
+        
+    return alphas
+
+def demicircleOTG(x,z,r,t,duration,legID,params,extra_theta):       #que demicercle au sol pas de segment
+    t = math.fmod(t,duration)
+    y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
+    x_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
+    #per1 = (d1/(d1+d2))*duration
+    per1 = duration /2 
+
+    if t<per1:
+            alphas = computeIKNotOriented(x_circle + x, y_circle,z, legID, params, verbose=False)   
     return alphas
 
 def main():
