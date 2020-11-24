@@ -223,6 +223,27 @@ def computeIKNotOriented(x, y, z, legID, params, verbose=False):
         z + params.z
     )
 
+def computeIK_RobotCentered(x, y, z, legID, verbose=False):
+
+    x += LEG_CENTER_POS[legID][0]
+    y += LEG_CENTER_POS[legID][1]
+    z += LEG_CENTER_POS[legID][2]
+
+    new_pos = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID])
+
+    return result = computeIK(new_pos[0],new_pos[1],new_pos[2],verbose=verbose,use_rads= True)
+
+def rotation_new(x,y,z,duration=1):
+    max_angle = math.pi/8
+    angle = max_angle* math.sin (2*math.pi*time.time()*0.5)
+    for leg_id in range (1,7):
+        r = 0.3
+
+        x = r * math.cos(angle)
+
+        y = r * math.sin(angle)
+        result = computeIK_RobotCentered(x,y,z,legID,verbose = False)
+    return result
 
 def rotaton_2D(x, y, z, theta):
     # Applying a rotation around the Z axis
@@ -419,7 +440,7 @@ def demicircleOTGITA(x,z,r,t,duration,legID,params):        # demicercle au sol 
         
     return alphas
 
-def demicircleOTG(x,z,r,t,duration,legID,params,extra_theta):       #que demicercle au sol pas de segment
+def demicircleOTG(x,z,r,t,duration,legID,params,extra_theta):       # que demicercle au sol pas de segment
     t = math.fmod(t,duration)
     y_circle = r * math.cos(2 * math.pi * (1 / duration) * t)
     x_circle =+ r * math.sin(2 * math.pi * (1 / duration) * t)
@@ -428,6 +449,7 @@ def demicircleOTG(x,z,r,t,duration,legID,params,extra_theta):       #que demicer
 
     if t<per1:
             alphas = computeIKNotOriented(x_circle + x, y_circle,z, legID, params, verbose=False)   
+            #alphas = rotaton_2D(alphas[0],alphas[1],alphas[2], -math.pi/4)
     return alphas
 
 def main():
