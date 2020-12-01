@@ -360,13 +360,9 @@ while True:
         sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
 
     elif args.mode == "rotatecirclenew" :
-        #x = p.readUserDebugParameter(controls["target_x"])
         x=0
         z = p.readUserDebugParameter(controls["target_z"])
-        r = p.readUserDebugParameter(controls["target_r"])
-        # w = p.readUserDebugParameter(controls["target_w"])
         duration = p.readUserDebugParameter(controls["target_duration"])
-        #extra_theta = p.readUserDebugParameter(controls["direction"])
         circle_radius_m = 0.3
         max_angle = math.pi/9
 
