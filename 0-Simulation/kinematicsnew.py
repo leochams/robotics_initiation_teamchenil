@@ -225,14 +225,15 @@ def computeIKNotOriented(x, y, z, legID, params, verbose=False):
 
 def computeIK_RobotCentered(x, y, z, legID, verbose=False):
 
-    x += LEG_CENTER_POS[legID][0]
-    y += LEG_CENTER_POS[legID][1]
-    z += LEG_CENTER_POS[legID][2]
+    x -= LEG_CENTER_POS[legID-1][0]
+    y -= LEG_CENTER_POS[legID-1][1]
+    z -= LEG_CENTER_POS[legID-1][2]
 
-    new_pos = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID])
+    new_pos = rotaton_2D(x ,y ,z ,-LEG_ANGLES[legID-1])
 
-    return result = computeIK(new_pos[0],new_pos[1],new_pos[2],verbose=verbose,use_rads= True)
-
+    result = computeIK(new_pos[0],new_pos[1],new_pos[2],verbose=verbose,use_rads= True)
+    return result
+    
 def rotation_new(x,y,z,duration=1):
     max_angle = math.pi/8
     angle = max_angle* math.sin (2*math.pi*time.time()*0.5)

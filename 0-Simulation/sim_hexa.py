@@ -62,6 +62,15 @@ def set_leg_angles(alphas, leg_id, targets, params):
         i += 1
         targets[name] = alphas[i]
 
+#calcul de distance entre 1/3,3/5...
+def calcul_dist(list_of_pos):
+    distances_pattes = [0,0,0,0,0,0]
+    for i in range (0,6):
+        distances_pattes[i] = math.sqrt(math.pow(list_of_pos[i][0]-list_of_pos[(i+2)%6][0],2)
+                                    +math.pow(list_of_pos[i][1]-list_of_pos[(i+2)%6][1],2)
+                                    +math.pow(list_of_pos[i][2]-list_of_pos[(i+2)%6][2],2))
+    return distances_pattes 
+
 # m_friction
 parser = argparse.ArgumentParser()
 parser.add_argument("--mode", "-m", type=str, default="direct", help="test")
@@ -75,6 +84,18 @@ sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
 
 leg_center_pos = [0.1248, -0.06164, 0.001116 + 0.5]
 leg_angle = -math.pi / 4
+
+old_distances_pattes = []
+distances_pattes = [0,0,0,0,0,0]
+
+new_time = 0
+old_time = 0
+
+patinage_delta_t = 0.1
+patinage_old_time = 0
+
+seuil_patinage_mm = 0.5
+
 
 params = Parameters()
 
@@ -130,18 +151,21 @@ elif args.mode == "walkingcircle_oriented":
     controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,1,0.595)
     controls["direction"] = p.addUserDebugParameter("direction",-math.pi,math.pi,math.pi/2)
 
-elif args.mode == "rotatecircle":
+elif args.mode == "rotatecircleold" or args.mode == "rotatecirclenew":
     #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
-    controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0,0.0)
+    controls["target_z"] = p.addUserDebugParameter("target_z",-2,0,-0.4)
     controls["target_r"] = p.addUserDebugParameter("target_r",0.01,0.5,0.023)
     # controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
     controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,5,1)
     #controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
 
+
+controls["seuil_patinage_mm"] = p.addUserDebugParameter("seuil_patinage_mm",0.01,3,0.5)
 initRobot(params,0)
 
 
 while True:
+
     targets = {}
     for name in sim.getJoints():
         if "c1" in name or "thigh" in name or "tibia" in name:
@@ -235,7 +259,7 @@ while True:
                 alphas = kinematicsnew.triangle(x,z,h,w,sim.t + 0.5*period ,period,leg_id,params,extra_theta)
 
                 set_leg_angles(alphas, leg_id, targets, params)
-            state = sim.setJoints(targets)
+        state = sim.setJoints(targets)
 
     elif args.mode == "walkingcircle_oriented" :
         #x = p.readUserDebugParameter(controls["target_x"])
@@ -292,8 +316,8 @@ while True:
                 #ultralphas = alphas1 + alphas2
                 set_leg_angles(ultralphas, leg_id, targets, params)
 
-            state = sim.setJoints(targets)
-            #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        state = sim.setJoints(targets)
+        #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
 
     elif args.mode == "walkingcircle" :
         #x = p.readUserDebugParameter(controls["target_x"])
@@ -312,10 +336,10 @@ while True:
                 alphas = kinematicsnew.segmentcircle(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params,extra_theta)
 
                 set_leg_angles(alphas, leg_id, targets, params)
-            state = sim.setJoints(targets)
-            sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        state = sim.setJoints(targets)
+        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
     
-    elif args.mode == "rotatecircle" :
+    elif args.mode == "rotatecircleold" :
         #x = p.readUserDebugParameter(controls["target_x"])
         x=0
         z = p.readUserDebugParameter(controls["target_z"])
@@ -332,10 +356,40 @@ while True:
                 alphas = kinematicsnew.demicircleOTGITA(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params)
 
                 set_leg_angles(alphas, leg_id, targets, params)
-            state = sim.setJoints(targets)
-            sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        state = sim.setJoints(targets)
+        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+
+    elif args.mode == "rotatecirclenew" :
+        #x = p.readUserDebugParameter(controls["target_x"])
+        x=0
+        z = p.readUserDebugParameter(controls["target_z"])
+        r = p.readUserDebugParameter(controls["target_r"])
+        # w = p.readUserDebugParameter(controls["target_w"])
+        duration = p.readUserDebugParameter(controls["target_duration"])
+        #extra_theta = p.readUserDebugParameter(controls["direction"])
+        circle_radius_m = 0.3
+        max_angle = math.pi/9
+
+        for leg_id in range (1,7):
+            angle = max_angle * math.cos(time.time()) + LEG_ANGLES[leg_id-1]
+            x = circle_radius_m*math.cos(angle)
+            y = circle_radius_m*math.sin(angle) 
+            alphas = kinematicsnew.computeIK_RobotCentered(x,y,z,leg_id)
+            set_leg_angles(alphas, leg_id, targets, params)
+
+        state = sim.setJoints(targets)
+        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
     
-            
+    elif args.mode == "patinage" :
+
+        for leg_id in range (1,7):
+            alphas = kinematicsnew.computeIK(0.2+0.05*math.sin(sim.t),0,-0.4)
+
+            set_leg_angles(alphas, leg_id, targets, params)
+        state = sim.setJoints(targets)
+        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+
+
     robot_pose = (sim.getRobotPose()) # (tuple(3), tuple(3)) -- (x,y,z), (roll, pitch, yaw)
     yaw = robot_pose[1][2]
     sim.lookAt(robot_pose[0]) 
@@ -343,20 +397,46 @@ while True:
     state = sim.setJoints(targets)      #state contient 3 tab position/vitesse/force
 
     # Debug visuel
+    list_of_pos = []
+    
     for leg_id in range (1,7):
         pos = kinematicsnew.computeDK(state[params.legs[leg_id][0]][0],
                                     state[params.legs[leg_id][1]][0] ,
                                     state[params.legs[leg_id][2]][0] )
         yaw = robot_pose[1][2]
-        pos = kinematicsnew.rotaton_2D(pos[0],pos[1],pos[2],- LEG_ANGLES[leg_id - 1] + yaw)  
+        pos = kinematicsnew.rotaton_2D(pos[0],pos[1],pos[2], LEG_ANGLES[leg_id - 1] + yaw)  
         leg_c_pos = kinematicsnew.rotaton_2D(LEG_CENTER_POS[leg_id-1][0],LEG_CENTER_POS[leg_id-1][1],LEG_CENTER_POS[leg_id-1][2],yaw)
         pos[0] += leg_c_pos[0] + robot_pose[0][0]
         pos[1] += leg_c_pos[1] + robot_pose[0][1]
         pos[2] += leg_c_pos[2] + robot_pose[0][2]
-
+        list_of_pos.append(pos)
         
-        print("DK pour {} = {}". format(leg_id,pos))
+        #print("DK pour {} = {}". format(leg_id,pos))
         sim.addDebugPosition(pos, duration=3)
 
+    #calcul freq
+    old_time = new_time
+    new_time = time.time()
+    dt = new_time - old_time
+    freq = 1 /(new_time - old_time)
+
+    seuil_patinage_mm = p.readUserDebugParameter(controls["seuil_patinage_mm"])
+
+    #calcul des distances 
+    if ((time.time() - patinage_old_time) >= patinage_delta_t):
+
+        old_distances_pattes = distances_pattes
+        distances_pattes = calcul_dist(list_of_pos)
+    
+        # # print("old_distance_pattes = {}".format(old_distances_pattes))
+        # # print("distance_pattes = {}".format(distances_pattes))
+
+        for i in range (0,6):
+            diff_dist = abs((old_distances_pattes[i]- distances_pattes[i])*1000)
+            if diff_dist >= seuil_patinage_mm :
+                print("Différence de distance entre la patte {} et la patte {} : {} \n ATTENTION!".format(i+1,((i+2)%6)+1,diff_dist))
+        print("period = {} s et freq = {} Hz".format(dt,freq))
+        patinage_old_time = time.time()
+    
     sim.tick()
 
