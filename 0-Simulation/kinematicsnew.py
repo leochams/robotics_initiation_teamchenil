@@ -205,7 +205,7 @@ def computeIKOriented(x, y, z, legID, params, extra_theta = 0, verbose=False):
 
 def computeIKOrientedExtraAngle(x, y, z, legID, params, extra_theta , verbose=False):
 
-    x,y,z = rotaton_2D(x ,y ,z ,LEG_ANGLES[legID-1] + extra_theta)
+    x,y,z = rotaton_2D(x ,y ,z ,LEG_ANGLES_2_MERDE[legID-1] + extra_theta)
     alphas = computeIK(x + params.initLeg[legID-1][0],
                         y + params.initLeg[legID-1][1],
                         z+ params.z)
@@ -234,17 +234,17 @@ def computeIK_RobotCentered(x, y, z, legID, verbose=False):
     result = computeIK(new_pos[0],new_pos[1],new_pos[2],verbose=verbose,use_rads= True)
     return result
     
-def rotation_new(x,y,z,duration=1):
-    max_angle = math.pi/8
-    angle = max_angle* math.sin (2*math.pi*time.time()*0.5)
-    for leg_id in range (1,7):
-        r = 0.3
+# def rotation_new(x,y,z,duration=1):
+#     max_angle = math.pi/8
+#     angle = max_angle* math.sin (2*math.pi*time.time()*0.5)
+#     for leg_id in range (1,7):
+#         r = 0.3
 
-        x = r * math.cos(angle)
+#         x = r * math.cos(angle)
 
-        y = r * math.sin(angle)
-        result = computeIK_RobotCentered(x,y,z,legID,verbose = False)
-    return result
+#         y = r * math.sin(angle)
+#         result = computeIK_RobotCentered(x,y,z,legID,verbose = False)
+#     return result
 
 def rotaton_2D(x, y, z, theta):
     # Applying a rotation around the Z axis
