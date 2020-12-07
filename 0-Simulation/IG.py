@@ -1,13 +1,12 @@
 import pygame, sys
-
+import os
 Clock = pygame.time.Clock()
 from pygame.locals import *
 pygame.init()
 pygame.display.set_caption('Hexapod : Team chenil')
 screen = pygame.display.set_mode((1000, 750))
 
-pygame.mixer.music.load('baha.ogg')
-pygame.mixer.music.play(-1)
+
 
 font = pygame.font.SysFont(None, 20)
  
@@ -17,9 +16,15 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
  
-click = False
  
 def main_menu():
+    
+    os.chdir('0-Simulation')
+    pygame.mixer.music.load('baha.ogg')
+    pygame.mixer.music.play(-1)
+
+    click = False
+
     
 
     while True:
@@ -87,88 +92,213 @@ def main_menu():
         Clock.tick(60)
  
 def mode1():
-    running = True
-    while running:
+    click = False
+    run = True
+    while run:
+ 
         screen.fill((0,0,0))
-        
+        #Chargement et collage du fond
+        # fond = pygame.image.load("Bordeaux.png")
+        # rect = fond.get_rect()
+        # screen.blit(fond,rect)
+        # pygame.display.flip()
+        # continuer = 1
+        # while continuer:
+	    #     continuer = int(input())
+
         draw_text('Moving an arbitrary leg to an arbitrary (x, y, z) position', font, (255, 255, 255), screen, 20, 20)
+ 
+        mx, my = pygame.mouse.get_pos()
+ 
+        button_1 = pygame.Rect(820, 100, 50, 50)
+        draw_text('Moving an arbitrary leg to an arbitrary (x, y, z) position', font, (255, 255, 255), screen, 30, 125)
+        
+        if button_1.collidepoint((mx, my)):
+            if click:
+                
+                os.system('python3 sim_hexa.py --mode walkingcircle')
+        
+
+        pygame.draw.rect(screen, (255, 0, 0), button_1)
+        
+ 
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-        
+                    run = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+ 
         pygame.display.update()
         Clock.tick(60)
+    
  
 def mode2():
-    running = True
-    while running:
+    
+    click = False
+    run = True
+    while run:
+ 
         screen.fill((0,0,0))
+        
+
         draw_text('Moving the center of the robot to an arbitrary (x, y, z) position (the 6 legs staying on the floor)', font, (255, 255, 255), screen, 20, 20)
+ 
+        mx, my = pygame.mouse.get_pos()
+ 
+        button_1 = pygame.Rect(820, 100, 50, 50)
+        draw_text('Moving the center of the robot to an arbitrary (x, y, z) position (the 6 legs staying on the floor)', font, (255, 255, 255), screen, 30, 125)
+        
+        if button_1.collidepoint((mx, my)):
+            if click:
+                
+                os.system('python3 sim_hexa.py --mode walkingcircle')
+        
+
+        pygame.draw.rect(screen, (255, 0, 0), button_1)
+        
+ 
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-        
+                    run = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+ 
         pygame.display.update()
         Clock.tick(60)
 
 def mode3():
-    running = True
-    while running:
-        screen.fill((0,0,0))
+  
+    click = False
+    run = True
+    while run:
  
+        screen.fill((0,0,0))
+        
+
         draw_text('Walking in a straight line', font, (255, 255, 255), screen, 20, 20)
+ 
+        mx, my = pygame.mouse.get_pos()
+ 
+        button_1 = pygame.Rect(820, 100, 50, 50)
+        draw_text('Walking in a straight line', font, (255, 255, 255), screen, 30, 125)
+        
+        if button_1.collidepoint((mx, my)):
+            if click:
+                
+                os.system('python3 sim_hexa.py --mode walkingcircle')
+        
+
+        pygame.draw.rect(screen, (255, 0, 0), button_1)
+        
+ 
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-        
+                    run = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+ 
         pygame.display.update()
         Clock.tick(60)
 
 def mode4():
-    running = True
-    while running:
-        screen.fill((0,0,0))
+    
+    click = False
+    run = True
+    while run:
  
+        screen.fill((0,0,0))
+        
+
         draw_text('Rotating without moving the center of the robot', font, (255, 255, 255), screen, 20, 20)
+ 
+        mx, my = pygame.mouse.get_pos()
+ 
+        button_1 = pygame.Rect(820, 100, 50, 50)
+        draw_text('Rotating without moving the center of the robot', font, (255, 255, 255), screen, 30, 125)
+        
+        if button_1.collidepoint((mx, my)):
+            if click:
+                
+                os.system('python3 sim_hexa.py --mode walkingcircle')
+        
+
+        pygame.draw.rect(screen, (255, 0, 0), button_1)
+        
+ 
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-        
+                    run = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+ 
         pygame.display.update()
         Clock.tick(60)
 
 def mode5():
-    running = True
-    while running:
-        screen.fill((0,0,0))
+   
+    click = False
+    run = True
+    while run:
  
+        screen.fill((0,0,0))
+        
+
         draw_text('crazy Frog', font, (255, 255, 255), screen, 20, 20)
+ 
+        mx, my = pygame.mouse.get_pos()
+ 
+        button_1 = pygame.Rect(820, 100, 50, 50)
+        draw_text('crazy Frog', font, (255, 255, 255), screen, 30, 125)
+        
+        if button_1.collidepoint((mx, my)):
+            if click:
+                
+                os.system('python3 sim_hexa.py --mode walkingcircle')
+        
+
+        pygame.draw.rect(screen, (255, 0, 0), button_1)
+        
+ 
+        click = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-        
+                    run = False
+            if event.type == MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    click = True
+ 
         pygame.display.update()
         Clock.tick(60)
+
+
 
 
 main_menu()
