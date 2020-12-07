@@ -29,7 +29,7 @@ def main_menu():
 
     while True:
  
-        screen.fill((0,0,0))
+        screen.fill((25, 25, 25))
         #Chargement et collage du fond
         # fond = pygame.image.load("Bordeaux.png")
         # rect = fond.get_rect()
@@ -69,11 +69,11 @@ def main_menu():
             if click:
                 mode5()
 
-        pygame.draw.rect(screen, (255, 0, 0), button_1)
+        pygame.draw.rect(screen, (0, 255, 0), button_1)
         pygame.draw.rect(screen, (255, 0, 0), button_2)
-        pygame.draw.rect(screen, (255, 0, 0), button_3)
-        pygame.draw.rect(screen, (255, 0, 0), button_4)
-        pygame.draw.rect(screen, (255, 0, 0), button_5)
+        pygame.draw.rect(screen, (0, 0, 255), button_3)
+        pygame.draw.rect(screen, (255, 0, 255), button_4)
+        pygame.draw.rect(screen, (255, 150, 100), button_5)
  
         click = False
         for event in pygame.event.get():
@@ -96,7 +96,7 @@ def mode1():
     run = True
     while run:
  
-        screen.fill((0,0,0))
+        screen.fill((25, 25, 25))
         #Chargement et collage du fond
         # fond = pygame.image.load("Bordeaux.png")
         # rect = fond.get_rect()
@@ -116,7 +116,7 @@ def mode1():
         if button_1.collidepoint((mx, my)):
             if click:
                 
-                os.system('python3 sim_hexa.py --mode walkingcircle')
+                os.system('python3 sim_hexa.py --mode frozen-direct')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
@@ -144,7 +144,7 @@ def mode2():
     run = True
     while run:
  
-        screen.fill((0,0,0))
+        screen.fill((25, 25, 25))
         
 
         draw_text('Moving the center of the robot to an arbitrary (x, y, z) position (the 6 legs staying on the floor)', font, (255, 255, 255), screen, 20, 20)
@@ -157,7 +157,7 @@ def mode2():
         if button_1.collidepoint((mx, my)):
             if click:
                 
-                os.system('python3 sim_hexa.py --mode walkingcircle')
+                os.system('python3 sim_hexa.py --mode robot-ik')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
@@ -184,7 +184,7 @@ def mode3():
     run = True
     while run:
  
-        screen.fill((0,0,0))
+        screen.fill((25, 25, 25))
         
 
         draw_text('Walking in a straight line', font, (255, 255, 255), screen, 20, 20)
@@ -192,15 +192,21 @@ def mode3():
         mx, my = pygame.mouse.get_pos()
  
         button_1 = pygame.Rect(820, 100, 50, 50)
-        draw_text('Walking in a straight line', font, (255, 255, 255), screen, 30, 125)
+        draw_text('Walking in a straight line : triangle', font, (255, 255, 255), screen, 30, 125)
+        button_2 = pygame.Rect(820, 200, 50, 50)
+        draw_text('Walking in a straight line : demi-cercle', font, (255, 255, 255), screen, 30, 225)
         
         if button_1.collidepoint((mx, my)):
             if click:
-                
+                os.system('python3 sim_hexa.py --mode walking')
+
+        if button_2.collidepoint((mx, my)):
+            if click:
                 os.system('python3 sim_hexa.py --mode walkingcircle')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
+        pygame.draw.rect(screen, (255, 0, 0), button_2)
         
  
         click = False
@@ -224,23 +230,30 @@ def mode4():
     run = True
     while run:
  
-        screen.fill((0,0,0))
+        screen.fill((25, 25, 25))
         
 
         draw_text('Rotating without moving the center of the robot', font, (255, 255, 255), screen, 20, 20)
  
         mx, my = pygame.mouse.get_pos()
  
+    
         button_1 = pygame.Rect(820, 100, 50, 50)
-        draw_text('Rotating without moving the center of the robot', font, (255, 255, 255), screen, 30, 125)
+        draw_text('Rotating without moving the center of the robot : triangle', font, (255, 255, 255), screen, 30, 125)
+        button_2 = pygame.Rect(820, 200, 50, 50)
+        draw_text('Rotating without moving the center of the robot : demi-crcle', font, (255, 255, 255), screen, 30, 225)
         
         if button_1.collidepoint((mx, my)):
             if click:
-                
-                os.system('python3 sim_hexa.py --mode walkingcircle')
+                os.system('python3 sim_hexa.py --mode rotatecircleold')
+
+        if button_2.collidepoint((mx, my)):
+            if click:
+                os.system('python3 sim_hexa.py --mode rotatecirclenew')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
+        pygame.draw.rect(screen, (255, 0, 0), button_2)
         
  
         click = False
@@ -264,7 +277,7 @@ def mode5():
     run = True
     while run:
  
-        screen.fill((0,0,0))
+        screen.fill((25, 25, 25))
         
 
         draw_text('crazy Frog', font, (255, 255, 255), screen, 20, 20)
