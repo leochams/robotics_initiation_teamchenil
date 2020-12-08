@@ -212,7 +212,7 @@ while True:
                 crosses[i], T, to_pybullet_quaternion(0, 0, leg_angle)
             )
         # Temp
-        sim.setRobotPose([0, 0, 0.5], to_pybullet_quaternion(0, 0, 0))
+        #sim.setRobotPose([0, 0, 0.5], to_pybullet_quaternion(0, 0, 0))
         # sim.setRobotPose(
         #     leg_center_pos, to_pybullet_quaternion(0, 0, 0),
         # )
@@ -324,7 +324,7 @@ while True:
                 ultralphas = [A0,A1,A2]
                 set_leg_angles(ultralphas, leg_id, targets, params)
         state = sim.setJoints(targets)    
-        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
 
     elif args.mode == "rotate_triangle" :
         x = p.readUserDebugParameter(controls["target_x"])
@@ -344,7 +344,7 @@ while True:
 
                 set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets) 
-        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])   
+        #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])   
 
     elif args.mode == "walkingcircle_oriented" :
         #x = p.readUserDebugParameter(controls["target_x"])
@@ -422,7 +422,7 @@ while True:
 
                 set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets)
-        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
     
     elif args.mode == "rotatecircleold" :
         #x = p.readUserDebugParameter(controls["target_x"])
@@ -443,7 +443,7 @@ while True:
 
                 set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets)
-        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
 
     elif args.mode == "rotatecirclenew" :
         x=0

@@ -52,7 +52,7 @@ def main_menu():
         button_4 = pygame.Rect(820, 400, 50, 50)
         draw_text('Rotating without moving the center of the robot', font, (255, 255, 255), screen, 30, 425)
         button_5 = pygame.Rect(820, 500, 50, 50)
-        draw_text('Moving as a Crazy Frog', font, (255, 255, 255), screen, 30, 525)
+        draw_text('Walking in a straight line in any direction without rotating (holonomic robot)', font, (255, 255, 255), screen, 30, 525)
         if button_1.collidepoint((mx, my)):
             if click:
                 mode1()
@@ -287,17 +287,17 @@ def mode5():
         screen.fill((25, 25, 25))
         
 
-        draw_text('crazy Frog', font, (255, 255, 255), screen, 20, 20)
+        draw_text('Walking in a straight line in any direction without rotating (holonomic robot)', font, (255, 255, 255), screen, 20, 20)
  
         mx, my = pygame.mouse.get_pos()
  
         button_1 = pygame.Rect(820, 100, 50, 50)
-        draw_text('crazy Frog', font, (255, 255, 255), screen, 30, 125)
+        draw_text('Walking in a straight line in any direction without rotating (holonomic robot)', font, (255, 255, 255), screen, 30, 125)
         
         if button_1.collidepoint((mx, my)):
             if click:
                 
-                os.system('python3 sim_hexa.py --mode walkingcircle')
+                os.system('python3 sim_hexa.py --mode walking_triangle_oriented')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
