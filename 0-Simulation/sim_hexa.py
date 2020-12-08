@@ -96,6 +96,9 @@ patinage_old_time = 0
 
 seuil_patinage_mm = 0.5
 
+old_robot_pos = 0
+new_robot_pos = 0
+vitesse = 0
 
 params = Parameters()
 
@@ -143,10 +146,12 @@ elif args.mode == "rotate_triangle":
     #controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
 
 elif args.mode == "walking_triangle_oriented":
-    #controls["target_x"] = p.addUserDebugParameter("target_x",0,0,0)
-    controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0.1,0)
-    controls["target_h"] = p.addUserDebugParameter("target_h",0,0.2,0.005)
-    controls["target_w"] = p.addUserDebugParameter("target_w",0.1,0.5,0.1)
+    controls["target_x"] = p.addUserDebugParameter("target_x",-0.2,0.2,0)
+    #controls["target_z"] = p.addUserDebugParameter("target_z",-0.1,0.1,0)
+    #controls["target_h1"] = p.addUserDebugParameter("target_h1",0,0.2,0.005)
+    #controls["target_h2"] = p.addUserDebugParameter("target_h2",0,0.2,0.005)
+    #controls["target_w1"] = p.addUserDebugParameter("target_w1",0,0.5,0.1)
+    controls["target_w2"] = p.addUserDebugParameter("target_w2",0,0.1,0)
     controls["target_p"] = p.addUserDebugParameter("target_p",0.1,10,1)
     controls["direction"] = p.addUserDebugParameter("direction",0,2*math.pi,0)
     controls["target_duration"] = p.addUserDebugParameter("target_duration",0.5,1,0.595)
@@ -279,22 +284,30 @@ while True:
 
                 set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets)
-        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
+        
+        # sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])
     
     elif args.mode == "walking_triangle_oriented" :
         #x = p.readUserDebugParameter(controls["target_x"])
         x=0
-        z = p.readUserDebugParameter(controls["target_z"])
-        h = p.readUserDebugParameter(controls["target_h"])
-        r = p.readUserDebugParameter(controls["target_r"])
-        w = p.readUserDebugParameter(controls["target_w"])
+        #z = p.readUserDebugParameter(controls["target_z"])
+        z = -0.05
+        #h1 = p.readUserDebugParameter(controls["target_h1"])
+        h1 = 0.02
+        #h2 = p.readUserDebugParameter(controls["target_h2"])
+        h2 = 0.01
+        #r = p.readUserDebugParameter(controls["target_r"])
+        #w1 = p.readUserDebugParameter(controls["target_w1"])
+        w1 = 0.1
+        w2 = p.readUserDebugParameter(controls["target_w2"])
         period = p.readUserDebugParameter(controls["target_p"])
         extra_theta = p.readUserDebugParameter(controls["direction"])
         duration = p.readUserDebugParameter(controls["target_duration"])
         for leg_id in range (1,7):
             if (leg_id == 1) or (leg_id == 3) or (leg_id == 5):
-                alphas1 = kinematicsnew.triangle(x,z,h,w,sim.t,period,leg_id,params,extra_theta)
-                alphas2 = kinematicsnew.demicircleOTGITA(x,z,r, sim.t,duration,leg_id,params)
+                alphas1 = kinematicsnew.triangle(x,z,h1,w1,sim.t,period,leg_id,params,extra_theta+math.pi/2)        #computeIkO
+                alphas2 = kinematicsnew.triangletimedNO(0,0,h2,w2,sim.t,period,leg_id,params)                       #computeIKNO
+                #alphas1 = [0,0,0]
                 A0 = (alphas1[0] + alphas2[0])
                 A1 = (alphas1[1] + alphas2[1])
                 A2 = (alphas1[2] + alphas2[2])
@@ -302,8 +315,9 @@ while True:
                 set_leg_angles(ultralphas, leg_id, targets, params)
 
             elif (leg_id == 2) or (leg_id == 4) or (leg_id == 6):
-                alphas1 = kinematicsnew.triangle(x,z,h,w,sim.t + 0.5*period ,period,leg_id,params,extra_theta)
-                alphas2 = kinematicsnew.demicircleOTGITA(x,z,r,sim.t + 0.5*duration ,duration,leg_id,params)
+                alphas1 = kinematicsnew.triangle(x,z,h1,w1,sim.t + 0.5*period ,period,leg_id,params,extra_theta+math.pi/2)
+                alphas2 = kinematicsnew.triangletimedNO(0,0,h2,w2,sim.t + 0.5*period,period,leg_id,params)
+                #alphas1 = [0,0,0]
                 A0 = (alphas1[0] + alphas2[0])
                 A1 = (alphas1[1] + alphas2[1])
                 A2 = (alphas1[2] + alphas2[2])
@@ -330,7 +344,7 @@ while True:
 
                 set_leg_angles(alphas, leg_id, targets, params)
         state = sim.setJoints(targets) 
-        #sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])   
+        sim.setRobotPose([0, 0, 0.5], [0, 0, 0, 1])   
 
     elif args.mode == "walkingcircle_oriented" :
         #x = p.readUserDebugParameter(controls["target_x"])
@@ -492,9 +506,14 @@ while True:
 
     #calcul des distances 
     if ((time.time() - patinage_old_time) >= patinage_delta_t):
-
+        
         old_distances_pattes = distances_pattes
         distances_pattes = calcul_dist(list_of_pos)
+
+        old_robot_pos = new_robot_pos
+        new_robot_pos = robot_pose[0][0]
+        vitesse = abs(old_robot_pos - new_robot_pos)/dt
+        print("Vitesse = {} m/s".format(vitesse))
     
         # # print("old_distance_pattes = {}".format(old_distances_pattes))
         # # print("distance_pattes = {}".format(distances_pattes))

@@ -328,6 +328,8 @@ def triangletimed(x, z, h, w, t, period):
     d1 = segdist(points[0],points[1])
     d2 = segdist(points[1],points[2])
     d3 = segdist(points[2],points[0])
+    if ((d1+d2+d3) == 0):
+        return computeIK(x,0,z)
     peri1 = (d1/(d1+d2+d3))*period
     peri2 = (d2/(d1+d2+d3))*period
     peri3 = (d3/(d1+d2+d3))*period
@@ -339,6 +341,30 @@ def triangletimed(x, z, h, w, t, period):
         alphas = segment_1way(points[1][0],points[1][1],points[1][2],points[2][0],points[2][1],points[2][2],t - peri1,peri2)
     else :
         alphas = segment_1way(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t - peri1 - peri2,peri3)
+    return alphas
+
+def triangletimedNO(x, z, h, w, t, period,leg_id,params):
+    """
+    Takes the geometric parameters of the triangle and the current time, gives the joint angles to draw the triangle with the tip of th leg. Format : [theta1, theta2, theta3]
+    """
+    
+    points = trianglePoints(x,z,h,w)
+    d1 = segdist(points[0],points[1])
+    d2 = segdist(points[1],points[2])
+    d3 = segdist(points[2],points[0])
+    if ((d1+d2+d3) == 0):
+        return computeIKNotOriented(x,0,z,leg_id,params)
+    peri1 = (d1/(d1+d2+d3))*period
+    peri2 = (d2/(d1+d2+d3))*period
+    peri3 = (d3/(d1+d2+d3))*period
+    t = math.fmod(t,period)
+    
+    if  (t < peri1) : 
+        alphas = segment_1wayNO(points[0][0],points[0][1],points[0][2],points[1][0],points[1][1],points[1][2],t,peri1,leg_id,params)
+    elif  (t < (peri1+peri2)) :
+        alphas = segment_1wayNO(points[1][0],points[1][1],points[1][2],points[2][0],points[2][1],points[2][2],t - peri1,peri2,leg_id,params)
+    else :
+        alphas = segment_1wayNO(points[2][0],points[2][1],points[2][2],points[0][0],points[0][1],points[0][2],t - peri1 - peri2,peri3,leg_id,params)
     return alphas
 
 def circlePoints(x, z, r, N=16):
