@@ -20,8 +20,8 @@ def draw_text(text, font, color, surface, x, y):
 def main_menu():
     
     os.chdir('0-Simulation')
-    pygame.mixer.music.load('baha.ogg')
-    pygame.mixer.music.play(-1)
+    # pygame.mixer.music.load('baha.ogg')
+    # pygame.mixer.music.play(-1)
 
     click = False
 
