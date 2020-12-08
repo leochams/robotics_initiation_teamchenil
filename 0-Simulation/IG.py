@@ -116,7 +116,7 @@ def mode1():
         if button_1.collidepoint((mx, my)):
             if click:
                 
-                os.system('python3 sim_hexa.py --mode frozen-direct')
+                os.system('python3 sim_hexa.py --mode inverse')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
@@ -241,19 +241,26 @@ def mode4():
         button_1 = pygame.Rect(820, 100, 50, 50)
         draw_text('Rotating without moving the center of the robot : triangle', font, (255, 255, 255), screen, 30, 125)
         button_2 = pygame.Rect(820, 200, 50, 50)
-        draw_text('Rotating without moving the center of the robot : demi-crcle', font, (255, 255, 255), screen, 30, 225)
+        draw_text('Rotating without moving the center of the robot : demi-circle (not centered)' , font, (255, 255, 255), screen, 30, 225)
+        button_3 = pygame.Rect(820, 300, 50, 50)
+        draw_text('Rotating without moving the center of the robot : demi-circle (centered)', font, (255, 255, 255), screen, 30, 325)
         
         if button_1.collidepoint((mx, my)):
             if click:
-                os.system('python3 sim_hexa.py --mode rotatecircleold')
+                os.system('python3 sim_hexa.py --mode rotate_triangle')
 
         if button_2.collidepoint((mx, my)):
+            if click:
+                os.system('python3 sim_hexa.py --mode rotatecircleold')
+
+        if button_3.collidepoint((mx, my)):
             if click:
                 os.system('python3 sim_hexa.py --mode rotatecirclenew')
         
 
         pygame.draw.rect(screen, (255, 0, 0), button_1)
         pygame.draw.rect(screen, (255, 0, 0), button_2)
+        pygame.draw.rect(screen, (255, 0, 0), button_3)
         
  
         click = False
