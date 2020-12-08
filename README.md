@@ -1,6 +1,5 @@
 # robotics_init_teamchenil
 
-Hello,
 In this directory you will find our simulation codes to interact in simulation on our hexapod.
 We have coded our hexapod so that it can notably walk in a holonomic way, that is to say, be able to walk in all directions.
 
