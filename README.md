@@ -9,8 +9,8 @@ We have coded our hexapod so that it can notably walk in a holonomic way, that i
 
 
 members of the project: 
-Léo Chamont
-Yanis Koufi
-Erwan Mathis
-Cédric Bouron
-Anthony Raffeneau
+- Léo Chamont
+- Yanis Koufi
+- Erwan Mathis
+- Cédric Bouron
+- Anthony Raffeneau
