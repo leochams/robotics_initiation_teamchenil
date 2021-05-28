@@ -5,7 +5,7 @@ We have coded our hexapod so that it can notably walk in a holonomic way, that i
 
 1st : clone our repository 
 2nd: open with visual code
-3rd: run IG.py and click on the chosen mode tolaunch the simulation
+3rd: run IG.py and click on the chosen mode to launch the simulation
 
 
 members of the project: 
